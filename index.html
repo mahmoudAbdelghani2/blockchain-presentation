@@ -1,0 +1,975 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blockchain Security Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      :root {
+        --bg-color: #0b132b;
+        --card-bg: #1c2541;
+        --primary-accent: #48cae4;
+        --secondary-accent: #0077b6;
+        --text-main: #f8f9fa;
+        --text-muted: #9cbfc7;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Poppins", "Lato", sans-serif;
+      }
+
+      body {
+        background-color: #050811;
+        color: var(--text-main);
+        overflow: hidden;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .presentation-container {
+        width: min(100vw, calc(100vh * 16 / 9));
+        height: min(100vh, calc(100vw * 9 / 16));
+        aspect-ratio: 16 / 9;
+        position: relative;
+        background: radial-gradient(
+          circle at 80% 20%,
+          #1e3a8a 0%,
+          var(--bg-color) 70%
+        );
+      }
+
+      .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        visibility: hidden;
+        transform: translate3d(0, 10px, 0);
+        transition:
+          opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+          transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+          visibility 0s linear 0.8s;
+        will-change: opacity, transform;
+        backface-visibility: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 60px 10%;
+        box-sizing: border-box;
+      }
+
+      .slide.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translate3d(0, 0, 0);
+        transition-delay: 0s;
+      }
+
+      .slide.active,
+      .slide.active * {
+        opacity: 1;
+        visibility: visible;
+        animation: none;
+        transform: none;
+      }
+
+      /* Ambient glow orb for subtle breathing effect */
+      @keyframes breathe {
+        0% {
+          transform: scale(1);
+          opacity: 0.85;
+        }
+        50% {
+          transform: scale(1.06);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 0.85;
+        }
+      }
+
+      .glow-orb {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 30% 30%,
+          rgba(100, 255, 218, 0.18),
+          rgba(100, 255, 218, 0.06)
+        );
+        box-shadow:
+          0 8px 40px rgba(100, 255, 218, 0.08),
+          inset 0 0 24px rgba(100, 255, 218, 0.02);
+        pointer-events: none;
+        animation: breathe 6s ease-in-out infinite;
+      }
+
+      /* Hover / interactive effects for tiles, boxes, cards and list items */
+      :root {
+        --hover-accent: #64ffda;
+      }
+
+      .card,
+      .flow-box,
+      li,
+      .example-box {
+        transition:
+          transform 240ms cubic-bezier(0.2, 0.9, 0.25, 1),
+          box-shadow 240ms ease,
+          border-color 240ms ease;
+      }
+
+      .card:hover,
+      .flow-box:hover,
+      li:hover,
+      .example-box:hover {
+        transform: translateY(-8px);
+        box-shadow:
+          0 20px 40px rgba(100, 255, 218, 0.12),
+          0 0 18px rgba(100, 255, 218, 0.06);
+        border-color: rgba(100, 255, 218, 0.6);
+      }
+
+      /* Make list markers glow on hover */
+      li:hover::before {
+        color: var(--hover-accent);
+        text-shadow: 0 0 12px rgba(100, 255, 218, 0.9);
+      }
+
+      /* Smooth, more premium progress bar */
+      .progress-bar {
+        transition: width 420ms cubic-bezier(0.2, 0.9, 0.25, 1);
+      }
+
+      /* Slide Typography & Elements */
+      h1 {
+        font-size: 3.5rem;
+        color: var(--primary-accent);
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow: 0 0 20px rgba(72, 202, 228, 0.4);
+      }
+
+      h2 {
+        font-size: 2.8rem;
+        color: var(--primary-accent);
+        margin-bottom: 30px;
+        position: relative;
+        display: inline-block;
+      }
+
+      h2::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background-color: var(--primary-accent);
+        border-radius: 2px;
+      }
+
+      h3 {
+        font-size: 1.8rem;
+        color: #ffffff;
+        margin-bottom: 15px;
+      }
+
+      p {
+        font-size: 1.25rem;
+        line-height: 1.6;
+        color: var(--text-muted);
+        margin-bottom: 15px;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-top: 20px;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+        margin-top: 20px;
+      }
+
+      .card {
+        background-color: var(--card-bg);
+        padding: 30px;
+        border-radius: 12px;
+        border-left: 5px solid var(--primary-accent);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+      }
+
+      .Styled_Bullet_Points {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 40px;
+        align-items: center;
+        margin-top: 18px;
+      }
+
+      .bullet-panel {
+        background: linear-gradient(
+          160deg,
+          rgba(28, 37, 65, 0.96),
+          rgba(11, 19, 43, 0.9)
+        );
+        border: 1px solid rgba(72, 202, 228, 0.18);
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+      }
+
+      .bullet-panel h3 {
+        color: var(--primary-accent);
+        margin-bottom: 18px;
+        font-size: 1.6rem;
+        letter-spacing: 0.4px;
+      }
+
+      .bullet-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .bullet-item {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        padding: 16px 18px;
+        border-radius: 14px;
+        background: rgba(7, 12, 27, 0.4);
+        border: 1px solid rgba(156, 191, 199, 0.14);
+      }
+
+      .bullet-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        background: linear-gradient(
+          135deg,
+          rgba(72, 202, 228, 0.2),
+          rgba(0, 119, 182, 0.25)
+        );
+        border: 1px solid rgba(72, 202, 228, 0.35);
+        color: var(--primary-accent);
+        font-size: 1rem;
+        box-shadow: 0 0 18px rgba(72, 202, 228, 0.12);
+      }
+
+      .bullet-copy strong {
+        color: #ffffff;
+        display: block;
+        font-size: 1.12rem;
+        margin-bottom: 4px;
+      }
+
+      .bullet-copy span {
+        color: var(--text-muted);
+        font-size: 1rem;
+        line-height: 1.55;
+      }
+
+      .bullet-side {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 18px;
+        padding: 10px 0;
+      }
+
+      .bullet-side .card {
+        margin-bottom: 0;
+      }
+
+      .bullet-quote {
+        font-family: "Lato", sans-serif;
+        font-size: 1.18rem;
+        line-height: 1.7;
+        color: var(--text-main);
+        background: rgba(7, 12, 27, 0.42);
+        border-left: 4px solid var(--primary-accent);
+        padding: 20px 22px;
+        border-radius: 12px;
+      }
+
+      .bullet-quote strong {
+        color: var(--primary-accent);
+      }
+
+      .hash-flow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 18px;
+        flex-wrap: wrap;
+      }
+
+      .flow-box {
+        min-width: 140px;
+        padding: 16px 22px;
+        border-radius: 999px;
+        border: 1px solid rgba(72, 202, 228, 0.35);
+        background: linear-gradient(
+          135deg,
+          rgba(28, 37, 65, 0.95),
+          rgba(10, 15, 29, 0.95)
+        );
+        color: var(--text-main);
+        text-align: center;
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+      }
+
+      .flow-arrow {
+        color: var(--primary-accent);
+        font-size: 1.6rem;
+        font-weight: bold;
+      }
+
+      ul {
+        list-style-type: none;
+      }
+
+      li {
+        font-size: 1.2rem;
+        margin-bottom: 12px;
+        position: relative;
+        padding-left: 25px;
+        color: var(--text-main);
+      }
+
+      li::before {
+        content: "▹";
+        position: absolute;
+        left: 0;
+        color: var(--primary-accent);
+        font-weight: bold;
+      }
+
+      /* Step workflow for slide 6 */
+      .steps-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 10px;
+      }
+
+      .step {
+        display: flex;
+        align-items: center;
+        background: rgba(28, 37, 65, 0.6);
+        padding: 15px 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(72, 202, 228, 0.2);
+      }
+
+      .step-num {
+        background: var(--primary-accent);
+        color: var(--bg-color);
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        margin-right: 20px;
+        flex-shrink: 0;
+      }
+
+      /* Title Slide Customization */
+      .title-slide {
+        text-align: center;
+        align-items: center;
+      }
+
+      .title-slide h1 {
+        font-size: 4.2rem;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        font-size: 1.8rem;
+        color: var(--text-muted);
+        margin-bottom: 60px;
+      }
+
+      .meta-info {
+        margin-top: 40px;
+        display: flex;
+        gap: 50px;
+        justify-content: center;
+        background: rgba(28, 37, 65, 0.4);
+        padding: 20px 40px;
+        border-radius: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .meta-item p {
+        margin-bottom: 0;
+        font-size: 1.1rem;
+      }
+
+      .meta-item strong {
+        color: var(--primary-accent);
+        display: block;
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+      }
+
+      /* Code/Hash box example */
+      .example-box {
+        background: #0a0f1d;
+        font-family: "Courier New", Courier, monospace;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px dashed var(--primary-accent);
+        margin-top: 15px;
+      }
+
+      .example-box span {
+        color: #e63946;
+      }
+
+      .example-box strong {
+        color: #06d6a0;
+      }
+
+      .academic-note {
+        margin-top: 18px;
+        padding: 16px 18px;
+        border-left: 4px solid var(--primary-accent);
+        background: rgba(28, 37, 65, 0.5);
+        border-radius: 10px;
+        color: var(--text-muted);
+        font-size: 1.02rem;
+        line-height: 1.6;
+      }
+
+      /* Presenter Controls */
+      .controls {
+        position: absolute;
+        bottom: 30px;
+        right: 50px;
+        display: flex;
+        gap: 15px;
+        z-index: 10;
+      }
+
+      .btn {
+        background: var(--card-bg);
+        color: var(--text-main);
+        border: 1px solid var(--primary-accent);
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s;
+      }
+
+      .btn:hover {
+        background: var(--primary-accent);
+        color: var(--bg-color);
+        box-shadow: 0 0 15px var(--primary-accent);
+      }
+
+      .progress-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 5px;
+        background: var(--primary-accent);
+        width: 0%;
+        transition: width 0.3s ease;
+        z-index: 10;
+      }
+
+      .oral-note {
+        margin-top: 25px;
+        font-style: italic;
+        color: #06d6a0;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .oral-note::before {
+        content: "💡 Note:";
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="presentation-container">
+      <!-- SLIDE 1: TITLE -->
+      <div class="slide title-slide active">
+        <h1>Blockchain Security</h1>
+        <div class="subtitle">Encryption, RSA & SHA</div>
+
+        <div class="meta-info">
+          <div class="meta-item">
+            <strong>Prepared By</strong>
+            <p>Mahmoud Abdelghani</p>
+            <p>Aliaa El-shaffei</p>
+          </div>
+          <div class="meta-item">
+            <strong>Course</strong>
+            <p>Cryptography</p>
+          </div>
+          <div class="meta-item">
+            <strong>Supervised By</strong>
+            <p>Dr/Hend</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 2: GENESIS OF BLOCKCHAIN -->
+      <div class="slide" id="slide-genesis">
+        <h2>The Genesis of Blockchain</h2>
+        <div class="Styled_Bullet_Points">
+          <div class="bullet-panel">
+            <div class="bullet-list">
+              <div class="bullet-item">
+                <div class="bullet-icon">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="bullet-copy">
+                  <strong>The Catalyst</strong>
+                  <span>2008 Global Financial Crisis &amp; loss of trust.</span>
+                </div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon">
+                  <i class="fa-solid fa-file-lines"></i>
+                </div>
+                <div class="bullet-copy">
+                  <strong>The Vision</strong>
+                  <span>Satoshi Nakamoto and the Bitcoin whitepaper.</span>
+                </div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon">
+                  <i class="fa-solid fa-user-slash"></i>
+                </div>
+                <div class="bullet-copy">
+                  <strong>The Goal</strong>
+                  <span
+                    >Eliminating the middleman through de-centralization.</span
+                  >
+                </div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><i class="fa-solid fa-code"></i></div>
+                <div class="bullet-copy">
+                  <strong>The Shift</strong>
+                  <span
+                    >Moving from trust in institutions to trust in code.</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bullet-side">
+            <div class="card">
+              <h3>Why It Matters</h3>
+              <p>
+                Blockchain began as a response to centralized failure and a new
+                model for digital trust.
+              </p>
+            </div>
+            <div class="bullet-quote">
+              <strong>Core idea:</strong> remove reliance on institutions and
+              let the protocol enforce trust.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 3: INTRODUCTION -->
+      <div class="slide">
+        <h2>Introduction</h2>
+        <div class="grid-3">
+          <div class="card">
+            <h3>What is Blockchain?</h3>
+            <ul>
+              <li>A decentralized digital ledger</li>
+              <li>Stores transactions securely</li>
+              <li>Used in cryptocurrencies like Bitcoin</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Why Security Matters?</h3>
+            <ul>
+              <li>Prevents data tampering</li>
+              <li>Protects user identities</li>
+              <li>Ensures trust without a central authority</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 4: BASICS OF CRYPTOGRAPHY -->
+      <div class="slide">
+        <h2>Introduction to Cryptography</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Core Concepts</h3>
+            <ul>
+              <li>Protects information from unauthorized access</li>
+              <li>
+                Converts readable data (plaintext) into encrypted data
+                (ciphertext)
+              </li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Two Main Types</h3>
+            <ul>
+              <li>
+                <strong>Symmetric Encryption:</strong> Uses a single key for
+                encryption and decryption.
+              </li>
+              <li>
+                <strong>Asymmetric Encryption:</strong> Uses a key pair (Public
+                & Private keys).
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 5: MAIN TECHNOLOGIES -->
+      <div class="slide">
+        <h2>Main Technologies</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Hash Functions (SHA)</h3>
+            <ul>
+              <li>Secure Hash Algorithm</li>
+              <li>Creates fixed-length digests</li>
+              <li>Protects data integrity</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>RSA Encryption</h3>
+            <ul>
+              <li>Asymmetric cryptography</li>
+              <li>Public and private key pairs</li>
+              <li>Used for digital signatures</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 6: SHA / HASHING -->
+      <div class="slide">
+        <h2>SHA and Hash Functions</h2>
+        <div class="grid-2">
+          <div>
+            <h3>Key Features</h3>
+            <ul>
+              <li><strong>SHA:</strong> Secure Hash Algorithm</li>
+              <li>Converts data into a fixed-length hash</li>
+              <li>One-way function (cannot be reversed)</li>
+              <li>Small input change &rarr; completely different hash</li>
+            </ul>
+            <div class="example-box">
+              Input: <span>Hello</span><br />
+              Hash:
+              <strong
+                >185f8db32271fe25f561a6fc938b2e264306ec304eba518007d1764826381969</strong
+              >
+            </div>
+          </div>
+          <div class="card">
+            <h3>Role in Blockchain</h3>
+            <ul>
+              <li>Each block contains the previous block's hash</li>
+              <li>Prevents modification of historically stored data</li>
+              <li>Creates complete chain integrity</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 7: RSA ENCRYPTION -->
+      <div class="slide">
+        <h2>RSA Algorithm</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>How It Works</h3>
+            <p>
+              RSA is an <strong>asymmetric</strong> encryption algorithm
+              utilizing two distinct keys:
+            </p>
+            <ul>
+              <li>
+                <strong>Public Key:</strong> Distributed openly; used to encrypt
+                data / verify signatures.
+              </li>
+              <li>
+                <strong>Private Key:</strong> Kept strictly secret; used to
+                decrypt data / create signatures.
+              </li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Application In Blockchain</h3>
+            <ul>
+              <li>Used extensively for <strong>Digital Signatures</strong></li>
+              <li>Verifies transaction ownership securely</li>
+              <li>Ensures robust authentication across nodes</li>
+            </ul>
+            <div class="academic-note">
+              RSA represents the concept of asymmetric cryptography in
+              blockchain, though modern systems like Bitcoin often use ECC
+              (Elliptic Curve Cryptography) for higher efficiency.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 8: PRACTICAL EXAMPLE -->
+      <div class="slide">
+        <h2>Practical Example: Bitcoin Transaction Verification</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Transaction Flow</h3>
+            <ul>
+              <li>
+                The sender creates a transaction and signs it digitally with a
+                private key.
+              </li>
+              <li>
+                Nodes verify the signature using the corresponding public key.
+              </li>
+              <li>
+                Once validated, the transaction is added to a block with its
+                hash.
+              </li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Verification Summary</h3>
+            <p>
+              In Bitcoin, a transaction is first authenticated through digital
+              signature verification, then it is hashed and included in the
+              block structure to preserve integrity and traceability.
+            </p>
+            <div
+              class="hash-flow"
+              aria-label="Bitcoin transaction verification flow"
+            >
+              <div class="flow-box">Signed Transaction</div>
+              <div class="flow-arrow">&rarr;</div>
+              <div class="flow-box">Validated by Nodes</div>
+              <div class="flow-arrow">&rarr;</div>
+              <div class="flow-box">Included in Block</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 9: HOW BLOCKCHAIN WORKS -->
+      <div class="slide">
+        <h2>How Blockchain Uses Cryptography</h2>
+        <p>
+          A step-by-step breakdown of cryptographic integration within a block
+          lifetime:
+        </p>
+        <div class="steps-container">
+          <div class="step">
+            <div class="step-num">1</div>
+            <p>User creates a new transaction</p>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <p>
+              Transaction is digitally signed using the user's
+              <strong>RSA Private Key</strong>
+            </p>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <p>
+              Data is compiled and hashed using <strong>SHA Algorithm</strong>
+            </p>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <p>
+              The new block is linked securely to the
+              <strong>previous block's hash</strong>
+            </p>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <p>The entire decentralized network verifies the block validity</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 10: ADVANTAGES & APPLICATIONS -->
+      <div class="slide">
+        <h2>Advantages & Applications</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Security Advantages</h3>
+            <ul>
+              <li>High multi-layered security</li>
+              <li>Complete Transparency & Auditability</li>
+              <li>Decentralization (No single point of failure)</li>
+              <li>Immutable Data integrity</li>
+              <li>Highly resistant to tampering and attacks</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Real-World Applications</h3>
+            <ul>
+              <li>Cryptocurrency & Digital Tokens</li>
+              <li>Secure Banking & Financial Systems</li>
+              <li>Healthcare Record Management</li>
+              <li>Supply Chain Tracking & Provenance</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 11: CONCLUSION -->
+      <div class="slide">
+        <h2>Conclusion</h2>
+        <div class="card" style="margin-bottom: 40px">
+          <ul>
+            <li>
+              Blockchain security depends heavily and inherently on
+              cryptography.
+            </li>
+            <li>
+              <strong>SHA</strong> functions perfectly to protect data integrity
+              and structure.
+            </li>
+            <li>
+              <strong>RSA</strong> enables secure user authentication and
+              non-repudiation via digital signatures.
+            </li>
+            <li>
+              Together, they establish a highly trusted, completely
+              decentralized global system.
+            </li>
+          </ul>
+        </div>
+        <h1 style="text-align: center; font-size: 3.5rem">Thank You!</h1>
+        <p
+          style="
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--primary-accent);
+          "
+        >
+          Any Questions?
+        </p>
+      </div>
+
+      <!-- Controls & Progress -->
+      <div class="controls">
+        <button class="btn" id="prevBtn">Previous</button>
+        <button class="btn" id="nextBtn">Next</button>
+      </div>
+      <div class="progress-bar" id="progress"></div>
+    </div>
+
+    <script>
+      const slides = document.querySelectorAll(".slide");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const progressBar = document.getElementById("progress");
+
+      let currentSlide = 0;
+
+      function updateSlides() {
+        slides.forEach((slide, index) => {
+          if (index === currentSlide) {
+            slide.classList.add("active");
+          } else {
+            slide.classList.remove("active");
+          }
+        });
+
+        // Update progress bar
+        const progressPercentage = ((currentSlide + 1) / slides.length) * 100;
+        progressBar.style.width = progressPercentage + "%";
+      }
+
+      nextBtn.addEventListener("click", () => {
+        if (currentSlide < slides.length - 1) {
+          currentSlide++;
+          updateSlides();
+        }
+      });
+
+      prevBtn.addEventListener("click", () => {
+        if (currentSlide > 0) {
+          currentSlide--;
+          updateSlides();
+        }
+      });
+
+      // Keyboard navigation
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight" || e.key === "Space" || e.key === " ") {
+          if (currentSlide < slides.length - 1) {
+            currentSlide++;
+            updateSlides();
+          }
+        } else if (e.key === "ArrowLeft") {
+          if (currentSlide > 0) {
+            currentSlide--;
+            updateSlides();
+          }
+        }
+      });
+
+      // Initial setup
+      updateSlides();
+    </script>
+  </body>
+</html>
